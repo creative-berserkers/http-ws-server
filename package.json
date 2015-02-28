@@ -1,0 +1,27 @@
+{
+  "name": "cb-http-ws-server",
+  "version": "0.0.6",
+  "description": "Simple iojs/node.js http and websocket server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/creative-berserkers/http-ws-server.git"
+  },
+  "keywords": [
+    "http",
+    "ws",
+    "server"
+  ],
+  "dependencies" : { 
+    "ws" : ">=0.6.0"
+  },
+  "author": "Odrinwhite",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/creative-berserkers/http-ws-server/issues"
+  },
+  "homepage": "https://github.com/creative-berserkers/http-ws-server"
+}
