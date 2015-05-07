@@ -36,7 +36,12 @@ function createServer(dir) {
     return http.createServer(function(req, res) {
         var uri = url.parse(req.url).pathname
         var unescapedUri = unescape(uri)
-        if (unescapedUri === '/') unescapedUri = 'index.html'
+        if (unescapedUri === '/' || 
+            (!unescapedUri.startsWith('/css/') && 
+            !unescapedUri.startsWith('/js/') && 
+            !unescapedUri.startsWith('/assets/') && 
+            !unescapedUri.startsWith('/views/'))) unescapedUri = 'index.html'
+            
         var filename = path.join(process.cwd() + dir, unescapedUri)
         var stats
 
