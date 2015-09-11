@@ -1,3 +1,5 @@
+'use strict'
+
 const WebSocketServer = require('ws').Server
 const http = require('http')
 const fs = require('fs')
