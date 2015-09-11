@@ -8,8 +8,9 @@ exports.Server = function bootstrap(s) {
     const spec = s || {}
     const port = spec.httpport || 8080
     const dirname = spec.dirname || '/public'
+    const libDir = spec.libDir || '/node_modules'
     
-    var server = createServer(dirname)
+    var server = createServer(dirname, libDir)
     server.listen(port)
 
     console.log("http server listening on %d", port)
@@ -23,7 +24,7 @@ exports.Server = function bootstrap(s) {
     return wss
 }
 
-function createServer(dir) {
+function createServer(publicDir, libDir) {
     var mimeTypes = {
         "html": "text/html",
         "jpeg": "image/jpeg",
@@ -36,13 +37,14 @@ function createServer(dir) {
     return http.createServer(function(req, res) {
         var uri = url.parse(req.url).pathname
         var unescapedUri = unescape(uri)
-        if (unescapedUri === '/' || 
-            (!unescapedUri.startsWith('/css/') && 
-            !unescapedUri.startsWith('/js/') && 
-            !unescapedUri.startsWith('/assets/') && 
-            !unescapedUri.startsWith('/views/'))) unescapedUri = 'index.html'
+        if (unescapedUri === '/') unescapedUri = 'index.html'
             
-        var filename = path.join(process.cwd() + dir, unescapedUri)
+        var filename = ""
+        if(unescapedUri.startsWith('/lib/')){
+            filename = path.join(process.cwd() + libDir, unescapedUri.slice(5))
+        } else {
+            filename = path.join(process.cwd() + publicDir, unescapedUri)
+        }
         var stats
 
         try {
