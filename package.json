@@ -1,6 +1,6 @@
 {
   "name": "cb-http-ws-server",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Simple iojs/node.js http and websocket server",
   "main": "index.js",
   "scripts": {

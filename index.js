@@ -1,31 +1,40 @@
-var WebSocketServer = require('ws').Server
-var http = require('http')
-var fs = require('fs')
-var url = require('url')
-var path = require('path')
+const WebSocketServer = require('ws').Server
+const http = require('http')
+const fs = require('fs')
+const url = require('url')
+const path = require('path')
 
 exports.Server = function bootstrap(s) {
     const spec = s || {}
     const port = spec.httpport || 8080
     const dirname = spec.dirname || '/public'
-    const libDir = spec.libDir || '/node_modules'
-    
-    var server = createServer(dirname, libDir)
+
+    console.log(`http server using ${dirname} as a base for sharing content`)
+
+    const server = createServer(dirname)
     server.listen(port)
 
-    console.log("http server listening on %d", port)
+    console.log(`http server listening on ${port}`)
 
     const wss = new WebSocketServer({
         server: server
     })
     
-    console.log("ws server listening on %d", wss.options.port || 8080)
+    console.log(`ws server listening on ${wss.options.port || 8080}`)
     
     return wss
 }
 
-function createServer(publicDir, libDir) {
-    var mimeTypes = {
+const handleError = (req, res)->{
+    res.writeHead(415, {
+        'Content-Type': 'text/plain'
+    })
+    res.write('404 Not Found\n')
+    res.end()
+}
+
+function createServer(publicDir) {
+    const mimeTypes = {
         "html": "text/html",
         "jpeg": "image/jpeg",
         "jpg": "image/jpeg",
@@ -35,49 +44,31 @@ function createServer(publicDir, libDir) {
     }
 
     return http.createServer(function(req, res) {
-        var uri = url.parse(req.url).pathname
-        var unescapedUri = unescape(uri)
-        if (unescapedUri === '/') unescapedUri = 'index.html'
+        const uri = url.parse(req.url).pathname
+        let decodedUri = decodeURI(uri)
+        if (decodedUri === '/' || decodedUri.includes('..')){
+            decodedUri = 'index.html'
+        }
             
-        var filename = ""
-        if(unescapedUri.startsWith('/lib/')){
-            filename = path.join(process.cwd() + libDir, unescapedUri.slice(5))
-        } else {
-            filename = path.join(process.cwd() + publicDir, unescapedUri)
-        }
-        var stats
+        const filename =  path.join(process.cwd() + publicDir, decodedUri)
 
-        try {
-            stats = fs.lstatSync(filename) // throws if path doesn't exist
-        }
-        catch (e) {
-            res.writeHead(415, {
-                'Content-Type': 'text/plain'
-            })
-            res.write('404 Not Found\n')
-            res.end()
-            return
-        }
+        fs.lstat(filename, (err, stats)->{
+            if(err){
+                return handleError(req, res, e)
+            }
+            if (stats.isFile()) {
+                // path exists, is a file
+                const mimeType = mimeTypes[path.extname(filename).split(".").reverse()[0]]
+                res.writeHead(200, {
+                    'Content-Type': mimeType
+                })
 
-
-        if (stats.isFile()) {
-            // path exists, is a file
-            var mimeType = mimeTypes[path.extname(filename).split(".").reverse()[0]]
-            res.writeHead(200, {
-                'Content-Type': mimeType
-            })
-
-            var fileStream = fs.createReadStream(filename)
-            fileStream.pipe(res)
-        }
-        else {
-            res.writeHead(415, {
-                'Content-Type': 'text/plain'
-            })
-            res.write('404 Not Found\n')
-            res.end()
-            return
-        }
-
+                const fileStream = fs.createReadStream(filename)
+                fileStream.pipe(res)
+            }
+            else {
+                return handleError(req, res)
+            }
+        })
     })
 }
