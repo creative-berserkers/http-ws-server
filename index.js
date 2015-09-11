@@ -25,7 +25,7 @@ exports.Server = function bootstrap(s) {
     return wss
 }
 
-const handleError = (req, res)->{
+const handleError = (req, res)=>{
     res.writeHead(415, {
         'Content-Type': 'text/plain'
     })
