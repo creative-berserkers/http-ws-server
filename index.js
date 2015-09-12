@@ -6,7 +6,7 @@ const fs = require('fs')
 const url = require('url')
 const path = require('path')
 
-exports.Server = function bootstrap(s) {
+module.exports = function Bootstrap(s) {
     const spec = s || {}
     const port = spec.httpport || 8080
     const dirname = spec.dirname || '/public'
@@ -54,7 +54,7 @@ function createServer(publicDir) {
             
         const filename =  path.join(process.cwd() + publicDir, decodedUri)
 
-        fs.lstat(filename, (err, stats)->{
+        fs.lstat(filename, (err, stats)=>{
             if(err){
                 return handleError(req, res, e)
             }
