@@ -21,17 +21,18 @@ module.exports = function Bootstrap(s) {
     const wss = new WebSocketServer({
         server: server
     })
-    
+
     console.log(`ws server listening on ${wss.options.port || 8080}`)
-    
+
     return wss
 }
 
-const handleError = (req, res)=>{
+const handleError = (req, res, err)=>{
     res.writeHead(415, {
         'Content-Type': 'text/plain'
     })
     res.write('404 Not Found\n')
+    res.write(err)
     res.end()
 }
 
@@ -51,12 +52,12 @@ function createServer(publicDir) {
         if (decodedUri === '/' || decodedUri.includes('..')){
             decodedUri = 'index.html'
         }
-            
+
         const filename =  path.join(process.cwd() + publicDir, decodedUri)
 
         fs.lstat(filename, (err, stats)=>{
             if(err){
-                return handleError(req, res, e)
+                return handleError(req, res, err.message)
             }
             if (stats.isFile()) {
                 // path exists, is a file

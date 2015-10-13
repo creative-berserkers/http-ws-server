@@ -1,6 +1,6 @@
 {
   "name": "cb-http-ws-server",
-  "version": "0.0.20",
+  "version": "0.0.22",
   "description": "Simple iojs/node.js http and websocket server",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "ws",
     "server"
   ],
-  "dependencies" : { 
+  "dependencies" : {
     "ws" : ">=0.6.0"
   },
   "author": "Odrinwhite",
